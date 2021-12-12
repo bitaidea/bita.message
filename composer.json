@@ -1,0 +1,27 @@
+{
+    "name": "bita/message",
+    "require": {
+        "illuminate/http": "^8.75"
+    },
+    "require-dev": {
+        "laravel/framework": "^8.75"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bita\\Message\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "FarshadFakhar",
+            "email": "farshadfakhar@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+          "providers": [
+            "Bita\\Message\\MessageServiceProvider"
+          ]
+        }
+      }
+}
