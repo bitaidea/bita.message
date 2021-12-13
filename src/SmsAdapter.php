@@ -1,9 +1,9 @@
 <?php
 
-namespace Bita\Message;
+namespace Bita;
 
-use Bita\Message\Service\IpPanelService;
-use Bita\Message\Service\SmsIrService;
+use Bita\Service\IpPanelService;
+use Bita\Service\SmsIrService;
 
 class SmsAdapter
 {
