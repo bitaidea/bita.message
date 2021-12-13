@@ -1,6 +1,6 @@
 <?php
 
-namespace Bita\Facades;
+namespace Bita\Message\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Bita\Service;
+namespace Bita\Message\Service;
 
-use Bita\Contract\SmsServiceInterface;
+use Bita\Message\Contract\SmsServiceInterface;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 

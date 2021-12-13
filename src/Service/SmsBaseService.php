@@ -1,8 +1,8 @@
 <?php
 
-namespace Bita\Service;
+namespace Bita\Message\Service;
 
-use Bita\Model\SmsLog;
+use Bita\Message\Model\SmsLog;
 
 class SmsBaseService
 {

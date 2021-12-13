@@ -1,6 +1,6 @@
 <?php
 
-namespace Bita\Model;
+namespace Bita\Message\Model;
 
 use Illuminate\Database\Eloquent\Model;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Bita\Contract;
+namespace Bita\Message\Contract;
 
 
 interface SmsServiceInterface
