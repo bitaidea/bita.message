@@ -5,7 +5,6 @@ namespace Bita\Message\Service;
 use Bita\Message\Contract\SmsServiceInterface;
 use Bita\Message\Exception\BitaException;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Http;
 
 class SmsIrService extends SmsBaseService implements SmsServiceInterface
 {
@@ -30,7 +29,7 @@ class SmsIrService extends SmsBaseService implements SmsServiceInterface
     public function getToken()
     {
         $param = ['UserApiKey' => $this->getApiKey(), 'SecretKey' => $this->getSecretKey(), 'System' => 'laravel_v_1_4'];
-        $res = Http::post($this->getEndPoint() . 'Token', $param);
+        $res = $this->client->post($this->getEndPoint() . 'Token', ['json' => $param]);
         return json_decode($res->getBody(), true)['TokenKey'];
     }
 
@@ -47,7 +46,7 @@ class SmsIrService extends SmsBaseService implements SmsServiceInterface
             "MobileNumbers" => $numbers,
             "LineNumber" => $this->getOriginator()
         ];
-        $res = Http::withHeaders(['x-sms-ir-secure-token' => $this->getToken()])->post($this->getEndPoint() . 'MessageSend', $param);
+        $res = $this->client->post($this->getEndPoint() . 'MessageSend', ['json' => $param, 'headers' => ['x-sms-ir-secure-token' => $this->getToken()]]);
         $res = json_decode($res->getBody()->getContents(), true);
         $this->getException($res);
         $this->log($res, $param);
@@ -62,7 +61,7 @@ class SmsIrService extends SmsBaseService implements SmsServiceInterface
             $params[] = ['Parameter' => $key, 'ParameterValue' => $value];
         }
         $param   = ['ParameterArray' => $params, 'TemplateId' => $pattern, 'Mobile' => $number];
-        $res = Http::withHeaders(['x-sms-ir-secure-token' => $this->getToken()])->post($this->getEndPoint() . 'UltraFastSend', $param);
+        $res = $this->client->post($this->getEndPoint() . 'UltraFastSend', ['json' => $param, 'headers' => ['x-sms-ir-secure-token' => $this->getToken()]]);
         $res = json_decode($res->getBody()->getContents(), true);
         $this->getException($res);
         $this->log($res, $param);
@@ -77,7 +76,7 @@ class SmsIrService extends SmsBaseService implements SmsServiceInterface
 
     public function credit()
     {
-        $res = Http::withHeaders(['x-sms-ir-secure-token' => $this->getToken()])->get($this->getEndPoint() . 'credit');
+        $res = $this->client->get($this->getEndPoint() . 'credit', ['headers' => ['x-sms-ir-secure-token' => $this->getToken()]]);
         $res = json_decode($res->getBody()->getContents(), true);
         $this->getException($res);
         return $res;
@@ -85,7 +84,7 @@ class SmsIrService extends SmsBaseService implements SmsServiceInterface
 
     public function getMessage($tracker_id)
     {
-        $res = Http::withHeaders(['x-sms-ir-secure-token' => $this->getToken()])->get($this->getEndPoint() . 'MessageSend/' . $tracker_id);
+        $res = $this->client->get($this->getEndPoint() . 'MessageSend/' . $tracker_id, ['headers' => ['x-sms-ir-secure-token' => $this->getToken()]]);
         $res = json_decode($res->getBody()->getContents(), true);
         $this->getException($res);
         return $res;
@@ -100,6 +99,7 @@ class SmsIrService extends SmsBaseService implements SmsServiceInterface
     {
         return Config::get('bitamessage.smsIr')['originator'];
     }
+
     public function getApiKey()
     {
         return Config::get('bitamessage.smsIr')['apiKey'];

@@ -5,7 +5,6 @@ namespace Bita\Message\Service;
 use Bita\Message\Contract\SmsServiceInterface;
 use Bita\Message\Exception\BitaException;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Http;
 
 class IpPanelService extends SmsBaseService implements SmsServiceInterface
 {
@@ -42,7 +41,8 @@ class IpPanelService extends SmsBaseService implements SmsServiceInterface
             "recipients" => $numbers,
             "message" => $message
         ];
-        $res = Http::withHeaders($this->getHeader())->post($this->getEndPoint() . 'messages', $param);
+        $res = $this->client->post($this->getEndPoint() . 'messages', ['json' => $param, 'headers' => $this->getHeader()]);
+        $res = json_decode($res->getBody()->getContents(), true);
         if (!isset($res['status']) || $res['status'] != "OK") {
             $error = isset($res['data']) && isset($res['data']['error']) ? $res['data']['error'] : 'مشکل در ارسال پیام';
             throw new BitaException($error);
@@ -60,7 +60,8 @@ class IpPanelService extends SmsBaseService implements SmsServiceInterface
             "recipient" => $number,
             "values" => $parameters
         ];
-        $res = Http::withHeaders($this->getHeader())->post($this->getEndPoint() . 'messages/patterns/send', $param);
+        $res = $this->client->post($this->getEndPoint() . 'messages/patterns/send', ['json' => $param, 'headers' => $this->getHeader()]);
+        $res = json_decode($res->getBody()->getContents(), true);
         if (!isset($res['data']) || !isset($res['data']['bulk_id']) || $res['data']['bulk_id'] == 0) {
             throw new BitaException('مشکل در ارسال پیام');
         }
@@ -70,7 +71,8 @@ class IpPanelService extends SmsBaseService implements SmsServiceInterface
 
     public function checkDelivery($tracker_id)
     {
-        $res = Http::withHeaders($this->getHeader())->get($this->getEndPoint() . "messages/$tracker_id/recipients");
+        $res = $this->client->get($this->getEndPoint() . "messages/$tracker_id/recipients", ['headers' => $this->getHeader()]);
+        $res = json_decode($res->getBody()->getContents(), true);
         if (!isset($res['data']) || !isset($res['data']['recipients']) || empty($res['data']['recipients'])) {
             throw new BitaException('کد بالک اشتباه است');
         }
@@ -79,7 +81,8 @@ class IpPanelService extends SmsBaseService implements SmsServiceInterface
 
     public function credit()
     {
-        $res = Http::withHeaders($this->getHeader())->get($this->getEndPoint() . 'credit');
+        $res = $this->client->get($this->getEndPoint() . 'credit', ['headers' => $this->getHeader()]);
+        $res = json_decode($res->getBody()->getContents(), true);
         if (isset($res['status']) && $res['status'] != "OK") {
             throw new BitaException('خطا');
         }
@@ -88,7 +91,8 @@ class IpPanelService extends SmsBaseService implements SmsServiceInterface
 
     public function getMessage($tracker_id)
     {
-        $res = Http::withHeaders($this->getHeader())->get($this->getEndPoint() . 'messages/' . $tracker_id);
+        $res = $this->client->get($this->getEndPoint() . 'messages/' . $tracker_id, ['headers' => $this->getHeader()]);
+        $res = json_decode($res->getBody()->getContents(), true);
         if (isset($res['status']) && $res['status'] != "OK") {
             throw new BitaException('خطا');
         }

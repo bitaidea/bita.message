@@ -15,6 +15,6 @@ return [
         'apiKey' => env('BITA_MESSAGE_SMS_IR_API_KEY'),
         'secretKey' => env('BITA_MESSAGE_SMS_IR_SECRET_KEY')
     ],
-    'logs' => true,
+    'logs' => false,
     'tableName' => 'sms_logs' //default name is sms_logs
 ];

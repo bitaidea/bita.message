@@ -5,8 +5,8 @@ namespace Bita\Message\Contract;
 
 interface SmsServiceInterface
 {
-    public static function send($message, $numbers);
-    public static function sendByPattern($pattern, $number, $parameters);
-    public static function checkDelivery($tracker_id);
-    public static function credit();
+    public function send($message, $numbers);
+    public function sendByPattern($pattern, $number, $parameters);
+    public function checkDelivery($tracker_id);
+    public function credit();
 }

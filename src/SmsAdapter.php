@@ -17,27 +17,30 @@ class SmsAdapter
         ];
     }
 
-    public function send($message, $numbers)
+    private function getService()
     {
         $service = $this->service[config('bitamessage.driver', 'smsir')];
-        return (new $service)->send($message, $numbers);
+        return (new $service);
+    }
+
+    public function send($message, $numbers)
+    {
+
+        return $this->getService()->send($message, $numbers);
     }
 
     public function sendByPattern($pattern, $number, $parameters)
     {
-        $service = $this->service[config('bitamessage.driver', 'smsir')];
-        return (new $service)->sendByPattern($pattern, $number, $parameters);
+        return $this->getService()->sendByPattern($pattern, $number, $parameters);
     }
 
     public function checkDelivery($tracker_id)
     {
-        $service = $this->service[config('bitamessage.driver', 'smsir')];
-        return (new $service)->checkDelivery($tracker_id);
+        return $this->getService()->checkDelivery($tracker_id);
     }
 
     public function credit()
     {
-        $service = $this->service[config('bitamessage.driver', 'smsir')];
-        return (new $service)->credit();
+        return $this->getService()->credit();
     }
 }

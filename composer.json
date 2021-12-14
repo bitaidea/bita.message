@@ -1,7 +1,7 @@
 {
     "name": "bita/message",
     "require": {
-        "illuminate/http": "^8.75"
+        "guzzlehttp/guzzle": "^7.4"
     },
     "require-dev": {
         "laravel/framework": "^8.75"
