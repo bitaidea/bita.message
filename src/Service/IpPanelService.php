@@ -3,102 +3,122 @@
 namespace Bita\Message\Service;
 
 use Bita\Message\Contract\SmsServiceInterface;
+use Bita\Message\Exception\BitaException;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 
 class IpPanelService extends SmsBaseService implements SmsServiceInterface
 {
-    public static function log($res, $param)
+    public function log($res, $param)
     {
-        $tracker_id = $res['data']['bulk_id'];
-        if (isset($param['pattern_code'])) {
-            $message = self::getMessage($tracker_id);
-            $message = $message['data']['message']['message'];
-            $numbers[] = ["ID" => $tracker_id, "MobileNo" => $param['recipient']];
-        } else {
-            $numbers = [];
-            foreach ($param['recipients'] as $number) {
-                array_push($numbers, ["ID" => $tracker_id, "MobileNo" => $number]);
+        if (!Config::get('bitamessage.logs')) return;
+        else {
+            $tracker_id = $res['data']['bulk_id'];
+            if (isset($param['pattern_code'])) {
+                $message = $this->getMessage($tracker_id);
+                $message = $message['data']['message']['message'];
+                $numbers[] = ["ID" => $tracker_id, "MobileNo" => $param['recipient']];
+            } else {
+                $numbers = [];
+                foreach ($param['recipients'] as $number) {
+                    array_push($numbers, ["ID" => $tracker_id, "MobileNo" => $number]);
+                }
+                $message = $param['message'];
             }
-            $message = $param['message'];
+            $status = $res['status'] == "OK" ? 1 : 0;
+            $this->DBLog($numbers, $this->getOriginator(), $message, $status, $this->getServiceName());
         }
-        $status = $res['status'] == "OK" ? 1 : 0;
-        self::DBLog($numbers, self::getOriginator(), $message, $status, self::getServiceName());
     }
 
-    public static function send($message, $numbers)
+    public function send($message, $numbers)
     {
         $nms = (array)$numbers;
         $numbers = [];
         foreach ($nms as $number) {
-            $numbers[] = self::pn2en($number);
+            $numbers[] = $this->pn2en($number);
         }
         $param = [
-            "originator" => self::getOriginator(),
+            "originator" => $this->getOriginator(),
             "recipients" => $numbers,
             "message" => $message
         ];
-        $res = Http::withHeaders(self::getHeader())->post(self::getEndPoint() . 'messages', $param);
-        self::log($res, $param);
+        $res = Http::withHeaders($this->getHeader())->post($this->getEndPoint() . 'messages', $param);
+        if (!isset($res['status']) || $res['status'] != "OK") {
+            $error = isset($res['data']) && isset($res['data']['error']) ? $res['data']['error'] : 'مشکل در ارسال پیام';
+            throw new BitaException($error);
+        }
+        $this->log($res, $param);
         return $res;
     }
 
-    public static function sendByPattern($pattern, $number, $parameters)
+    public function sendByPattern($pattern, $number, $parameters)
     {
-        $number = self::pn2en($number);
+        $number = $this->pn2en($number);
         $param = [
             "pattern_code" => $pattern,
-            "originator" => self::getOriginator(),
+            "originator" => $this->getOriginator(),
             "recipient" => $number,
             "values" => $parameters
         ];
-        $res = Http::withHeaders(self::getHeader())->post(self::getEndPoint() . 'messages/patterns/send', $param);
-        self::log($res, $param);
+        $res = Http::withHeaders($this->getHeader())->post($this->getEndPoint() . 'messages/patterns/send', $param);
+        if (!isset($res['data']) || !isset($res['data']['bulk_id']) || $res['data']['bulk_id'] == 0) {
+            throw new BitaException('مشکل در ارسال پیام');
+        }
+        $this->log($res, $param);
         return $res;
     }
 
-    public static function checkDelivery($tracker_id)
+    public function checkDelivery($tracker_id)
     {
-        $res = Http::withHeaders(self::getHeader())->get(self::getEndPoint() . "messages/$tracker_id/recipients");
+        $res = Http::withHeaders($this->getHeader())->get($this->getEndPoint() . "messages/$tracker_id/recipients");
+        if (!isset($res['data']) || !isset($res['data']['recipients']) || empty($res['data']['recipients'])) {
+            throw new BitaException('کد بالک اشتباه است');
+        }
         return $res;
     }
 
-    public static function credit()
+    public function credit()
     {
-        $res = Http::withHeaders(self::getHeader())->get(self::getEndPoint() . 'credit');
+        $res = Http::withHeaders($this->getHeader())->get($this->getEndPoint() . 'credit');
+        if (isset($res['status']) && $res['status'] != "OK") {
+            throw new BitaException('خطا');
+        }
         return $res;
     }
 
-    public static function getMessage($tracker_id)
+    public function getMessage($tracker_id)
     {
-        $res = Http::withHeaders(self::getHeader())->get(self::getEndPoint() . 'messages/' . $tracker_id);
+        $res = Http::withHeaders($this->getHeader())->get($this->getEndPoint() . 'messages/' . $tracker_id);
+        if (isset($res['status']) && $res['status'] != "OK") {
+            throw new BitaException('خطا');
+        }
         return $res;
     }
 
-    public static function getEndPoint()
+    public function getEndPoint()
     {
         return Config::get('bitamessage.ipPanel')['endPoint'];
     }
 
-    public static function getOriginator()
+    public function getOriginator()
     {
         return Config::get('bitamessage.ipPanel')['originator'];
     }
 
-    public static function getApiKey()
+    public function getApiKey()
     {
         return Config::get('bitamessage.ipPanel')['apiKey'];
     }
 
-    public static function getServiceName()
+    public function getServiceName()
     {
         return Config::get('bitamessage.ipPanel')['name'];
     }
-     
-    public static function getHeader()
+
+    public function getHeader()
     {
         return [
-            'Authorization' => 'AccessKey ' . self::getApiKey(),
+            'Authorization' => 'AccessKey ' . $this->getApiKey(),
             'Content-Type' => 'application/json'
         ];
     }

@@ -3,104 +3,123 @@
 namespace Bita\Message\Service;
 
 use Bita\Message\Contract\SmsServiceInterface;
+use Bita\Message\Exception\BitaException;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 
 class SmsIrService extends SmsBaseService implements SmsServiceInterface
 {
-    public static function log($res, $param)
+    public function log($res, $param)
     {
-        $res = json_decode($res->getBody()->getContents(), true);
-        if (isset($param['TemplateId'])) {
-            $tracker_id = (int)$res['VerificationCodeId'];
-            $message = self::getMessage($tracker_id);
-            $message = $message['Messages']['SMSMessageBody'];
-            $numbers[] = ["ID" => $tracker_id, "MobileNo" => $param['Mobile']];
-        } else {
-            $numbers = $res['Ids'];
-            $message = $param['Messages'][0];
+        if (!Config::get('bitamessage.logs')) return;
+        else {
+            if (isset($param['TemplateId'])) {
+                $tracker_id = (int)$res['VerificationCodeId'];
+                $message = $this->getMessage($tracker_id);
+                $message = $message['Messages']['SMSMessageBody'];
+                $numbers[] = ["ID" => $tracker_id, "MobileNo" => $param['Mobile']];
+            } else {
+                $numbers = $res['Ids'];
+                $message = $param['Messages'][0];
+            }
+            $status = $res['IsSuccessful'] == "true" ? 1 : 0;
+            $this->DBLog($numbers, $this->getOriginator(), $message, $status, $this->getServiceName());
         }
-        $status = $res['IsSuccessful'] == "true" ? 1 : 0;
-        self::DBLog($numbers, self::getOriginator(), $message, $status, self::getServiceName());
     }
 
-    public static function getToken()
+    public function getToken()
     {
-        $param = ['UserApiKey' => self::getApiKey(), 'SecretKey' => self::getSecretKey(), 'System' => 'laravel_v_1_4'];
-        $res = Http::post(self::getEndPoint() . 'Token', $param);
+        $param = ['UserApiKey' => $this->getApiKey(), 'SecretKey' => $this->getSecretKey(), 'System' => 'laravel_v_1_4'];
+        $res = Http::post($this->getEndPoint() . 'Token', $param);
         return json_decode($res->getBody(), true)['TokenKey'];
     }
 
-    public static function send($message, $numbers)
+    public function send($message, $numbers)
     {
         $nms = (array)$numbers;
         $numbers = [];
         foreach ($nms as $number) {
-            $numbers[] = self::pn2en($number);
+            $numbers[] = $this->pn2en($number);
         }
         $messages[] = $message;
         $param = [
             "Messages" => $messages,
             "MobileNumbers" => $numbers,
-            "LineNumber" => self::getOriginator()
+            "LineNumber" => $this->getOriginator()
         ];
-        $res = Http::withHeaders(['x-sms-ir-secure-token' => self::getToken()])->post(self::getEndPoint() . 'MessageSend', $param);
-        self::log($res, $param);
+        $res = Http::withHeaders(['x-sms-ir-secure-token' => $this->getToken()])->post($this->getEndPoint() . 'MessageSend', $param);
+        $res = json_decode($res->getBody()->getContents(), true);
+        $this->getException($res);
+        $this->log($res, $param);
         return $res;
     }
 
-    public static function sendByPattern($pattern, $number, $parameters)
+    public function sendByPattern($pattern, $number, $parameters)
     {
-        $number = self::pn2en($number);
+        $number = $this->pn2en($number);
         $params = [];
         foreach ($parameters as $key => $value) {
             $params[] = ['Parameter' => $key, 'ParameterValue' => $value];
         }
         $param   = ['ParameterArray' => $params, 'TemplateId' => $pattern, 'Mobile' => $number];
-        $res = Http::withHeaders(['x-sms-ir-secure-token' => self::getToken()])->post(self::getEndPoint() . 'UltraFastSend', $param);
-        self::log($res, $param);
+        $res = Http::withHeaders(['x-sms-ir-secure-token' => $this->getToken()])->post($this->getEndPoint() . 'UltraFastSend', $param);
+        $res = json_decode($res->getBody()->getContents(), true);
+        $this->getException($res);
+        $this->log($res, $param);
         return $res;
     }
 
-    public static function checkDelivery($tracker_id)
+    public function checkDelivery($tracker_id)
     {
-        $res = self::getMessage($tracker_id);
+        $res = $this->getMessage($tracker_id);
         return $res;
     }
 
-    public static function credit()
+    public function credit()
     {
-        $res = Http::withHeaders(['x-sms-ir-secure-token' => self::getToken()])->get(self::getEndPoint() . 'credit');
+        $res = Http::withHeaders(['x-sms-ir-secure-token' => $this->getToken()])->get($this->getEndPoint() . 'credit');
+        $res = json_decode($res->getBody()->getContents(), true);
+        $this->getException($res);
         return $res;
     }
 
-    public static function getMessage($tracker_id)
+    public function getMessage($tracker_id)
     {
-        $res = Http::withHeaders(['x-sms-ir-secure-token' => self::getToken()])->get(self::getEndPoint() . 'MessageSend/' . $tracker_id);
-        return json_decode($res->getBody(), true);
+        $res = Http::withHeaders(['x-sms-ir-secure-token' => $this->getToken()])->get($this->getEndPoint() . 'MessageSend/' . $tracker_id);
+        $res = json_decode($res->getBody()->getContents(), true);
+        $this->getException($res);
+        return $res;
     }
 
-    public static function getEndPoint()
+    public function getEndPoint()
     {
         return Config::get('bitamessage.smsIr')['endPoint'];
     }
 
-    public static function getOriginator()
+    public function getOriginator()
     {
         return Config::get('bitamessage.smsIr')['originator'];
     }
-    public static function getApiKey()
+    public function getApiKey()
     {
         return Config::get('bitamessage.smsIr')['apiKey'];
     }
 
-    public static function getSecretKey()
+    public function getSecretKey()
     {
         return Config::get('bitamessage.smsIr')['secretKey'];
     }
 
-    public static function getServiceName()
+    public function getServiceName()
     {
         return Config::get('bitamessage.smsIr')['name'];
+    }
+
+    public function getException($res)
+    {
+        if (isset($res['IsSuccessful']) && $res['IsSuccessful'] != "true") {
+            $error = isset($res['Message']) ? $res['Message'] : 'خظا';
+            throw new BitaException($error);
+        } else return;
     }
 }

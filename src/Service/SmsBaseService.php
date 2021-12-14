@@ -2,11 +2,11 @@
 
 namespace Bita\Message\Service;
 
-use Bita\Message\Model\SmsLog;
+use Illuminate\Support\Facades\DB;
 
 class SmsBaseService
 {
-    public static function pn2en($string)
+    public function pn2en($string)
     {
         $newNumbers = range(0, 9);
         // 1. Persian HTML decimal
@@ -24,7 +24,7 @@ class SmsBaseService
         return str_replace($persian, $newNumbers, $string);
     }
 
-    public static function DBLog($numbers, $originator, $message, $status, $service)
+    public function DBLog($numbers, $originator, $message, $status, $service)
     {
         foreach ($numbers as $v) {
             $dataToInsert[] = [
@@ -37,6 +37,7 @@ class SmsBaseService
                 'created_at' => now()
             ];
         }
-        SmsLog::insert($dataToInsert);
+        $tableName = config('bitamessage.tableName', 'sms_logs');
+        DB::table($tableName)->insert($dataToInsert);
     }
 }
