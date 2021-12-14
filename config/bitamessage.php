@@ -1,7 +1,7 @@
 <?php
 
 return [
-    // 'driver' => 'ippanel', //smsir Or ippanel
+    // 'driver' => 'ippanel', //default servuce is smsir 
     'ipPanel' => [
         'name' => 'IpPanel',
         'endPoint' => env('BITA_MESSAGE_IP_PANEL_ENDPOINT'),
@@ -14,5 +14,7 @@ return [
         'originator' => env('BITA_MESSAGE_SMS_IR_ORIGINATOR'),
         'apiKey' => env('BITA_MESSAGE_SMS_IR_API_KEY'),
         'secretKey' => env('BITA_MESSAGE_SMS_IR_SECRET_KEY')
-    ]
+    ],
+    'logs' => true,
+    'tableName' => 'sms_logs' //default name is sms_logs
 ];
