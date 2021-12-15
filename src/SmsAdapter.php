@@ -2,19 +2,13 @@
 
 namespace Bita\Message;
 
-use Bita\Message\Service\IpPanelService;
-use Bita\Message\Service\SmsIrService;
-
 class SmsAdapter
 {
     protected $service;
 
     public function __construct()
     {
-        $this->service = [
-            'smsir' => SmsIrService::class,
-            'ippanel' => IpPanelService::class
-        ];
+        $this->service = config('bitamessage.drivers');
     }
 
     private function getService()
@@ -25,7 +19,6 @@ class SmsAdapter
 
     public function send($message, $numbers)
     {
-
         return $this->getService()->send($message, $numbers);
     }
 
