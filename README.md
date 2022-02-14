@@ -38,3 +38,19 @@ After publish the package files you must add your provider configuration in .env
 >
 >- BITA_MESSAGE_SMS_IR_SECRET_KEY=your secret key
 
+How To Use:
+-----
+change default service in bitamessage.php and call provider configuration from .env in that.
+if you want to log messages in database,set logs = true and set the table name in bitamessage.php.
+
+### now to send message
+> Message::send($message, array $numbers);
+
+### to send message by pattern
+> Message::sendByPattern($pattern, $number, array $parameters);
+
+### to check delivery
+> Message::checkDelivery($tracker_id);
+
+### to get credit
+> Message::credit();
