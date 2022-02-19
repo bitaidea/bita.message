@@ -2,6 +2,7 @@
 
 use Bita\Message\Service\IpPanelService;
 use Bita\Message\Service\SmsIrService;
+use Bita\Message\Service\TestService;
 
 return [
     'driver' => 'ippanel', //default service is smsir 
