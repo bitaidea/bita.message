@@ -23,6 +23,7 @@ return [
     //you can add driver here and set the key in driver
     'drivers' => [
         'ippanel' => IpPanelService::class,
-        'smsir' => SmsIrService::class
+        'smsir' => SmsIrService::class,
+        'test' => TestService::class
     ]
 ];
