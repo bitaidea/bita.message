@@ -28,66 +28,41 @@ class TestService extends SmsBaseService implements SmsServiceInterface
 
     public function getToken()
     {
-        $param = ['UserApiKey' => $this->getApiKey(), 'SecretKey' => $this->getSecretKey(), 'System' => 'laravel_v_1_4'];
-        $res = $this->client->post($this->getEndPoint() . 'Token', ['json' => $param]);
-        return json_decode($res->getBody(), true)['TokenKey'];
+
     }
 
     public function send($message, $numbers)
     {
-        $nms = (array)$numbers;
-        $numbers = [];
-        foreach ($nms as $number) {
-            $numbers[] = $this->pn2en($number);
-        }
-        $messages[] = $message;
-        $param = [
-            "Messages" => $messages,
-            "MobileNumbers" => $numbers,
-            "LineNumber" => $this->getOriginator()
-        ];
-        $res = $this->client->post($this->getEndPoint() . 'MessageSend', ['json' => $param, 'headers' => ['x-sms-ir-secure-token' => $this->getToken()]]);
-        $res = json_decode($res->getBody()->getContents(), true);
-        $this->getException($res);
-        $this->log($res, $param);
-        return $res;
+        return  [
+            "VerificationCodeId" => 290737339.0,
+            "IsSuccessful" => true,
+            "Message" => "your verification code is sent"
+          ];
+
     }
 
     public function sendByPattern($pattern, $number, $parameters)
     {
-        $number = $this->pn2en($number);
-        $params = [];
-        foreach ($parameters as $key => $value) {
-            $params[] = ['Parameter' => $key, 'ParameterValue' => $value];
-        }
-        $param   = ['ParameterArray' => $params, 'TemplateId' => $pattern, 'Mobile' => $number];
-        $res = $this->client->post($this->getEndPoint() . 'UltraFastSend', ['json' => $param, 'headers' => ['x-sms-ir-secure-token' => $this->getToken()]]);
-        $res = json_decode($res->getBody()->getContents(), true);
-        $this->getException($res);
-        $this->log($res, $param);
-        return $res;
+        return  [
+            "VerificationCodeId" => 290737339.0,
+            "IsSuccessful" => true,
+            "Message" => "your verification code is sent"
+          ];
+
     }
 
     public function checkDelivery($tracker_id)
     {
-        $res = $this->getMessage($tracker_id);
-        return $res;
     }
 
     public function credit()
     {
-        $res = $this->client->get($this->getEndPoint() . 'credit', ['headers' => ['x-sms-ir-secure-token' => $this->getToken()]]);
-        $res = json_decode($res->getBody()->getContents(), true);
-        $this->getException($res);
-        return $res;
+      
     }
 
     public function getMessage($tracker_id)
     {
-        $res = $this->client->get($this->getEndPoint() . 'MessageSend/' . $tracker_id, ['headers' => ['x-sms-ir-secure-token' => $this->getToken()]]);
-        $res = json_decode($res->getBody()->getContents(), true);
-        $this->getException($res);
-        return $res;
+      
     }
 
     public function getEndPoint()
