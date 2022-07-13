@@ -22,7 +22,7 @@ return [
     ],
     'smsIrV2' => [
         'name' => 'SmsIrV2',
-        'endPoint' => env('BITA_MESSAGE_SMS_IR_V2_ENDPOINT'),
+        'endPoint' => env('BITA_MESSAGE_SMS_IR_V2_ENDPOINT','https://api.sms.ir/v1/'),
         'apiKey' => env('BITA_MESSAGE_SMS_IR_V2_API_KEY'),
         'originator' => env('BITA_MESSAGE_SMS_IR_V2_ORIGINATOR')
     ],
