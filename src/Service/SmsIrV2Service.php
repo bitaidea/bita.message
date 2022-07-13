@@ -2,6 +2,8 @@
 
 namespace Bita\Message\Service;
 
+use Bita\Message\Contract\Response\SendByPatternResponse;
+use Bita\Message\Contract\Response\SendResponse;
 use Bita\Message\Contract\SmsServiceInterface;
 use Bita\Message\Exception\BitaException;
 use GuzzleHttp\Client;
@@ -55,7 +57,7 @@ class SmsIrV2Service extends SmsBaseService implements SmsServiceInterface
         $res = $this->client->post('send/bulk', ['body' => json_encode($param)]);
         $res = json_decode($res->getBody()->getContents(), true);
         $this->getException($res);
-        return $res;
+        return (new SendResponse($res['status'],$res['data']['packId'],$res['message']))->toArray();
     }
 
     public function sendByPattern($pattern, $number, $parameters)
@@ -71,7 +73,7 @@ class SmsIrV2Service extends SmsBaseService implements SmsServiceInterface
         $res = json_decode($res->getBody()->getContents(), true);
         $this->getException($res);
         $this->log($res, $param);
-        return $res;
+        return (new SendByPatternResponse($res['status'],$res['data']['messageId'],$res['message']))->toArray();
     }
 
     public function checkDelivery($tracker_id)
