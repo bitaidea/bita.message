@@ -38,6 +38,12 @@ After publish the package files you must add your provider configuration in .env
 >
 >- BITA_MESSAGE_SMS_IR_SECRET_KEY=your secret key
 
+> SMS IR V2
+>
+>- BITA_MESSAGE_SMS_IR_V2_ORIGINATOR=your line number
+>
+>- BITA_MESSAGE_SMS_IR_V2_API_KEY=your api key
+
 How To Use:
 -----
 change default service in bitamessage.php and call provider configuration from .env in that.
