@@ -7,7 +7,7 @@ use Bita\Message\Service\SmsIrV2Service;
 use Bita\Message\Service\TestService;
 
 return [
-    'driver' => 'kavenegar', //default service is smsir
+    'driver' => 'kavenegar', //default service is kavenegar
     'ipPanel' => [
         'name' => 'IpPanel',
         'endPoint' => env('BITA_MESSAGE_IP_PANEL_ENDPOINT'),

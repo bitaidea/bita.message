@@ -2,6 +2,7 @@
 
 namespace Bita\Message\Service;
 
+use Bita\Message\Contract\Response\GetCreditResponse;
 use Bita\Message\Contract\Response\SendByPatternResponse;
 use Bita\Message\Contract\Response\SendResponse;
 use Bita\Message\Contract\SmsServiceInterface;
@@ -57,7 +58,7 @@ class SmsIrV2Service extends SmsBaseService implements SmsServiceInterface
         $res = $this->client->post('send/bulk', ['body' => json_encode($param)]);
         $res = json_decode($res->getBody()->getContents(), true);
         $this->getException($res);
-        return (new SendResponse($res['status'],$res['data']['packId'],$res['message']))->toArray();
+        return (new SendResponse($res['status'], $res['data']['packId'], $res['message'], $res['data']['cost']))->toArray();
     }
 
     public function sendByPattern($pattern, $number, $parameters)
@@ -73,7 +74,7 @@ class SmsIrV2Service extends SmsBaseService implements SmsServiceInterface
         $res = json_decode($res->getBody()->getContents(), true);
         $this->getException($res);
         $this->log($res, $param);
-        return (new SendByPatternResponse($res['status'],$res['data']['messageId'],$res['message']))->toArray();
+        return (new SendByPatternResponse($res['status'], $res['data']['messageId'], $res['message'], $res['data']['cost']))->toArray();
     }
 
     public function checkDelivery($tracker_id)
@@ -87,7 +88,7 @@ class SmsIrV2Service extends SmsBaseService implements SmsServiceInterface
         $res = $this->client->get('credit');
         $res = json_decode($res->getBody()->getContents(), true);
         $this->getException($res);
-        return $res;
+        return (new GetCreditResponse($res['data']))->toArray();
     }
 
     public function getMessage($tracker_id)

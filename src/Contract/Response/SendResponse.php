@@ -6,8 +6,8 @@ use Bita\Message\Contract\BaseResponse;
 
 class SendResponse extends BaseResponse
 {
-    public function __construct(bool $status, $packId, string $message)
+    public function __construct(bool $status, $packId, string $message, $cost = 0)
     {
-        $this->data = compact('status', 'packId', 'message');
+        $this->data = compact('status', 'packId', 'message', 'cost');
     }
 }

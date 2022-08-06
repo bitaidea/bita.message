@@ -3,6 +3,7 @@
 namespace Bita\Message\Service;
 
 use Bita\Management\Services\SystemStatus;
+use Bita\Message\Contract\Response\GetCreditResponse;
 use Bita\Message\Contract\Response\SendByPatternResponse;
 use Bita\Message\Contract\Response\SendResponse;
 use Bita\Message\Contract\SmsServiceInterface;
@@ -25,10 +26,21 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
 
     public function log($res, $param)
     {
+        if (!Config::get('bitamessage.logs')) return;
+
+        $numbers = [];
+        if ($param['receptor'])
+            foreach ($param['receptor'] as $number)
+                $numbers[] = $number;
+
+        $this->DBLog($numbers, $this->getNumber(), $res['return']['message'], 0, $this->getServiceName());
     }
 
     public function checkDelivery($tracker_id)
     {
+        $key = $this->getToken();
+        $result = $this->client->post("$key/sms/status.json?messageid={$tracker_id}");
+        $res = json_decode($result->getBody(), true);
     }
 
 
@@ -56,6 +68,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $result     = $this->client->post("$key/sms/send.json", ['json' => $body]);
 
         $res = json_decode($result->getBody(), true);
+        $this->log($res, $body);
 
         return (new SendResponse($res['status'], $res['data']['packId'], $res['message']))->toArray();
     }
@@ -86,8 +99,10 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $result = $this->client->get("$key/verify/lookup.json?receptor=$number&template=$template_id" . $qs);
 
         $res = json_decode($result->getBody(), true);
+        $entries = $res['entries'][0];
 
-        return (new SendByPatternResponse($res['return']['status'] == 200, $res['entries'][0]['messageid'], $res['return']['message']))->toArray();
+        $this->log($res, ['receptor' => $number]);
+        return (new SendByPatternResponse($res['return']['status'] == 200, $entries['messageid'], $res['return']['message'], $entries['cost']))->toArray();
     }
 
     /**
@@ -101,8 +116,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $result = Http::get("$key/account/info.json");
         $res = json_decode($result->getBody(), true);
         $credit = $res['entries']['remaincredit'];
-        SystemStatus::set('sms_credit', $credit);
-        return $credit;
+        return (new GetCreditResponse($credit))->toArray();
     }
 
     private  function getNumber()
