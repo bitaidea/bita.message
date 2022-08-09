@@ -2,6 +2,8 @@
 
 namespace Bita\Message\Service;
 
+use Bita\Message\Contract\Response\SendByPatternResponse;
+use Bita\Message\Contract\Response\SendResponse;
 use Bita\Message\Contract\SmsServiceInterface;
 use Bita\Message\Exception\BitaException;
 use Illuminate\Support\Facades\Config;
@@ -33,22 +35,12 @@ class TestService extends SmsBaseService implements SmsServiceInterface
 
     public function send($message, $numbers)
     {
-        return  [
-            "VerificationCodeId" => 290737339.0,
-            "IsSuccessful" => true,
-            "Message" => "your verification code is sent"
-          ];
-
+        return (new SendResponse(true,290737339.0,"your verification code is sent"))->toArray();
     }
 
     public function sendByPattern($pattern, $number, $parameters)
     {
-        return  [
-            "VerificationCodeId" => 290737339.0,
-            "IsSuccessful" => true,
-            "Message" => "your verification code is sent"
-          ];
-
+        return (new SendByPatternResponse(true,290737339.0,"your verification code is sent"))->toArray();
     }
 
     public function checkDelivery($tracker_id)

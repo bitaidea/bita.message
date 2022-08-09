@@ -1,12 +1,13 @@
 <?php
 
 use Bita\Message\Service\IpPanelService;
+use Bita\Message\Service\KavenegarService;
 use Bita\Message\Service\SmsIrService;
 use Bita\Message\Service\SmsIrV2Service;
 use Bita\Message\Service\TestService;
 
 return [
-    'driver' => 'smsirv2', //default service is smsir
+    'driver' => 'kavenegar', //default service is kavenegar
     'ipPanel' => [
         'name' => 'IpPanel',
         'endPoint' => env('BITA_MESSAGE_IP_PANEL_ENDPOINT'),
@@ -26,6 +27,12 @@ return [
         'apiKey' => env('BITA_MESSAGE_SMS_IR_V2_API_KEY'),
         'originator' => env('BITA_MESSAGE_SMS_IR_V2_ORIGINATOR')
     ],
+    'kavenegar' => [
+        'name' => 'Kavenegar',
+        'endPoint' => env('BITA_MESSAGE_KAVENEGAR_ENDPOINT','https://api.kavenegar.com/v1/'),
+        'apiKey' => env('BITA_MESSAGE_KAVENEGAR_API_KEY'),
+        'originator' => env('BITA_MESSAGE_KAVENEGAR_ORIGINATOR')
+    ],
     'logs' => false,
     'tableName' => 'sms_logs', //default name is sms_logs
     //you can add driver here and set the key in driver
@@ -33,6 +40,7 @@ return [
         'ippanel' => IpPanelService::class,
         'smsir' => SmsIrService::class,
         'smsirv2' => SmsIrV2Service::class,
+        'kavenegar' => KavenegarService::class,
         'test' => TestService::class
     ]
 ];
