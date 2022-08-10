@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Http;
 
 class KavenegarService extends SmsBaseService implements SmsServiceInterface
 {
-
+    protected $key = "kavenegar";
+    
     public function __construct()
     {
         $this->client = new Client([
