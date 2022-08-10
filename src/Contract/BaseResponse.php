@@ -5,7 +5,7 @@ namespace Bita\Message\Contract;
 
 abstract class BaseResponse
 {
-    protected $data;
+    public $data;
     // public abstract function __construct();
 
     public function toArray() {
