@@ -70,7 +70,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $res = json_decode($result->getBody(), true);
         $this->log($res, $body);
 
-        return (new SendResponse($res['status'], $res['data']['packId'], $res['message']))->toArray();
+        return (new SendResponse($res['status'], $res['data']['packId'], $res['message']))->event()->toArray();
     }
 
     /**
@@ -102,7 +102,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $entries = $res['entries'][0];
 
         $this->log($res, ['receptor' => $number]);
-        return (new SendByPatternResponse($res['return']['status'] == 200, $entries['messageid'], $res['return']['message'], $entries['cost']))->toArray();
+        return (new SendByPatternResponse($res['return']['status'] == 200, $entries['messageid'], $res['return']['message'], $entries['cost']))->event()->toArray();
     }
 
     /**
