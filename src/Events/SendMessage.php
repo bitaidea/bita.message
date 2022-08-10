@@ -7,7 +7,7 @@ use Illuminate\Queue\SerializesModels;
 
 class SendMessage
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, SerializesModels;
 
     public $response;
 
