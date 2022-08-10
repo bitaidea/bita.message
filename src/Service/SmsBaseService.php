@@ -15,20 +15,6 @@ class SmsBaseService
         $this->client = new Client();
     }
 
-    public function middleware($func)
-    {
-        $config = config("bitamessage.middleware.{$this->key}.$func", null);
-
-        if (!$config)
-            return true;
-
-        foreach ($config as $middleware) {
-            if ($middleware::check() == false)
-                return false;
-        }
-        return true;
-    }
-
     public function pn2en($string)
     {
         $newNumbers = range(0, 9);

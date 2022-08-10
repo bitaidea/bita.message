@@ -42,6 +42,5 @@ return [
         'smsirv2' => SmsIrV2Service::class,
         'kavenegar' => KavenegarService::class,
         'test' => TestService::class
-    ],
-    'middleware' => null
+    ]
 ];

@@ -11,10 +11,4 @@ class SendByPatternResponse extends BaseResponse
     {
         $this->data = compact('status', 'messageId', 'message', 'cost');
     }
-
-    public function event()
-    {
-        event(new SendMessage($this));
-        return $this;
-    }
 }

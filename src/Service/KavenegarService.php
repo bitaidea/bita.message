@@ -7,6 +7,7 @@ use Bita\Message\Contract\Response\GetCreditResponse;
 use Bita\Message\Contract\Response\SendByPatternResponse;
 use Bita\Message\Contract\Response\SendResponse;
 use Bita\Message\Contract\SmsServiceInterface;
+use Bita\Message\Events\SendMessage;
 use Bita\Message\Service\SmsBaseService;
 use Bita\Notification\Models\SmsLog;
 use Exception;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Http;
 class KavenegarService extends SmsBaseService implements SmsServiceInterface
 {
     protected $key = "kavenegar";
-    
+
     public function __construct()
     {
         $this->client = new Client([
@@ -74,7 +75,9 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $res = json_decode($result->getBody(), true);
         $this->log($res, $body);
 
-        return (new SendResponse($res['status'], $res['data']['packId'], $res['message']))->event()->toArray();
+        $sendResponse = new SendResponse($res['status'], $res['data']['packId'], $res['message']);
+        event(new SendMessage($sendResponse));
+        return $sendResponse->toArray();
     }
 
     /**
@@ -109,7 +112,10 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $entries = $res['entries'][0];
 
         $this->log($res, ['receptor' => $number]);
-        return (new SendByPatternResponse($res['return']['status'] == 200, $entries['messageid'], $res['return']['message'], $entries['cost']))->event()->toArray();
+        $sendByPatternResponse = new SendByPatternResponse($res['return']['status'] == 200, $entries['messageid'], $res['return']['message'], $entries['cost']);
+        event(new SendMessage($sendByPatternResponse));
+
+        return $sendByPatternResponse->toArray();
     }
 
     /**
