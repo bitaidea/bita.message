@@ -10,6 +10,7 @@ class SendMessage
     use Dispatchable, SerializesModels;
 
     public $response;
+    public $pattern;
 
     /**
      * Create a new event instance.
@@ -17,8 +18,9 @@ class SendMessage
      * @return void
      */
 
-    public function __construct($response)
+    public function __construct($response, $pattern = '')
     {
         $this->response = $response;
+        $this->pattern = $pattern;
     }
 }
