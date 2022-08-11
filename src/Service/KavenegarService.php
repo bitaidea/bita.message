@@ -61,9 +61,6 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
      */
     public function send($message, $numbers)
     {
-        if (!$this->middleware('send'))
-            return false;
-
         $nms = (array)$numbers;
         $numbers = null;
         foreach ($nms as $k => $number) {
@@ -92,9 +89,6 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
 
     public function sendByPattern($template_id, $number, $parameters)
     {
-        if (!$this->middleware('sendByPattern'))
-            return false;
-
         $tokens = array_values($parameters);
         $qs = '';
         foreach ($tokens as $k => $v) {
