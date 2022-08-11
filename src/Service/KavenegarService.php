@@ -70,7 +70,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         }
         $key = $this->getToken();
         $body   = ['message' => $message, 'receptor' => $numbers, 'sender' => $this->getNumber()];
-        $result     = $this->client->post("$key/sms/send.json", ['json' => $body]);
+        $result     = $this->client->post("$key/sms/send.json", ['body' => json_encode($body)]);
 
         $res = json_decode($result->getBody(), true);
         $this->log($res, $body);
