@@ -90,7 +90,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
 
     public function sendByPattern($template_id, $number, $parameters)
     {
-        $hasToken = Str::startsWith($parameters[array_keys($parameters)[0]], 'token');
+        $hasToken = Str::startsWith(array_keys($parameters)[0], 'token');
         $tokens = array_values($parameters);
         $qs = '';
 
