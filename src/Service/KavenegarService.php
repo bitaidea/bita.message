@@ -95,7 +95,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $qs = '';
 
         if ($hasToken)
-            foreach ($tokens as $k => $v) {
+            foreach ($parameters as $k => $v) {
                 $qs .= "&$k=$v";
             }
         else
