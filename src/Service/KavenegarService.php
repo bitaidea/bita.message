@@ -14,6 +14,7 @@ use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class KavenegarService extends SmsBaseService implements SmsServiceInterface
 {
@@ -89,18 +90,25 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
 
     public function sendByPattern($template_id, $number, $parameters)
     {
+        $hasToken = Str::startsWith($parameters[array_keys($parameters)[0]], 'token');
         $tokens = array_values($parameters);
         $qs = '';
-        foreach ($tokens as $k => $v) {
-            $val = str_replace(' ', '.', $v);
 
-            if ($k == 0)
-                $qs .= "&token=$val";
-            else {
-                $index = intval($k) + 1;
-                $qs .= "&token$index=$val";
+        if ($hasToken)
+            foreach ($tokens as $k => $v) {
+                $qs .= "&$k=$v";
             }
-        }
+        else
+            foreach ($tokens as $k => $v) {
+                $val = str_replace(' ', '.', $v);
+
+                if ($k == 0)
+                    $qs .= "&token=$val";
+                else {
+                    $index = intval($k) + 1;
+                    $qs .= "&token$index=$val";
+                }
+            }
 
         $key = $this->getToken();
         $result = $this->client->get("$key/verify/lookup.json?receptor=$number&template=$template_id" . $qs);
