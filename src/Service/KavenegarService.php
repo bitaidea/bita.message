@@ -7,20 +7,26 @@ use Bita\Message\Contract\Response\GetCreditResponse;
 use Bita\Message\Contract\Response\SendByPatternResponse;
 use Bita\Message\Contract\Response\SendResponse;
 use Bita\Message\Contract\SmsServiceInterface;
+use Bita\Message\Events\SendMessage;
 use Bita\Message\Service\SmsBaseService;
 use Bita\Notification\Models\SmsLog;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class KavenegarService extends SmsBaseService implements SmsServiceInterface
 {
+    protected $key = "kavenegar";
 
     public function __construct()
     {
         $this->client = new Client([
             'base_uri' => $this->getEndPoint(),
+            'headers' => [
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ],
         ]);
     }
 
@@ -65,12 +71,14 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         }
         $key = $this->getToken();
         $body   = ['message' => $message, 'receptor' => $numbers, 'sender' => $this->getNumber()];
-        $result     = $this->client->post("$key/sms/send.json", ['json' => $body]);
+        $result     = $this->client->post("$key/sms/send.json", ['form_params' => $body]);
 
         $res = json_decode($result->getBody(), true);
         $this->log($res, $body);
 
-        return (new SendResponse($res['status'], $res['data']['packId'], $res['message']))->toArray();
+        $sendResponse = new SendResponse($res['status'], $res['data']['packId'], $res['message']);
+        event(new SendMessage($sendResponse));
+        return $sendResponse->toArray();
     }
 
     /**
@@ -82,18 +90,25 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
 
     public function sendByPattern($template_id, $number, $parameters)
     {
+        $hasToken = Str::startsWith(array_keys($parameters)[0], 'token');
         $tokens = array_values($parameters);
         $qs = '';
-        foreach ($tokens as $k => $v) {
-            $val = str_replace(' ', '.', $v);
 
-            if ($k == 0)
-                $qs .= "&token=$val";
-            else {
-                $index = intval($k) + 1;
-                $qs .= "&token$index=$val";
+        if ($hasToken)
+            foreach ($parameters as $k => $v) {
+                $qs .= "&$k=$v";
             }
-        }
+        else
+            foreach ($tokens as $k => $v) {
+                $val = str_replace(' ', '.', $v);
+
+                if ($k == 0)
+                    $qs .= "&token=$val";
+                else {
+                    $index = intval($k) + 1;
+                    $qs .= "&token$index=$val";
+                }
+            }
 
         $key = $this->getToken();
         $result = $this->client->get("$key/verify/lookup.json?receptor=$number&template=$template_id" . $qs);
@@ -102,7 +117,10 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $entries = $res['entries'][0];
 
         $this->log($res, ['receptor' => $number]);
-        return (new SendByPatternResponse($res['return']['status'] == 200, $entries['messageid'], $res['return']['message'], $entries['cost']))->toArray();
+        $sendByPatternResponse = new SendByPatternResponse($res['return']['status'] == 200, $entries['messageid'], $res['return']['message'], $entries['cost']);
+        event(new SendMessage($sendByPatternResponse, $template_id));
+
+        return $sendByPatternResponse->toArray();
     }
 
     /**

@@ -8,10 +8,13 @@ use Illuminate\Support\Facades\DB;
 class SmsBaseService
 {
     protected $client;
+    protected $key;
+
     public function __construct()
     {
         $this->client = new Client();
     }
+
     public function pn2en($string)
     {
         $newNumbers = range(0, 9);

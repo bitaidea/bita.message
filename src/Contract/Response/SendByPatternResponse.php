@@ -3,6 +3,7 @@
 namespace Bita\Message\Contract\Response;
 
 use Bita\Message\Contract\BaseResponse;
+use Bita\Message\Events\SendMessage;
 
 class SendByPatternResponse extends BaseResponse
 {
