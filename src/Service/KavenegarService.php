@@ -39,7 +39,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
             foreach ($param['receptor'] as $number)
                 $numbers[] = $number;
 
-        $this->DBLog($numbers, $this->getNumber(), $res['return']['message'], 0, $this->getServiceName());
+        $this->DBLog($numbers, $this->getNumber(), $res['return']['message'], 0, Config::get('bitamessage.kavenegar')['name']);
     }
 
     public function checkDelivery($tracker_id)
@@ -116,7 +116,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $res = json_decode($result->getBody(), true);
         $entries = $res['entries'][0];
 
-        $this->log($res, ['receptor' => $number]);
+        $this->log($res, ['receptor' => [$number]]);
         $sendByPatternResponse = new SendByPatternResponse($res['return']['status'] == 200, $entries['messageid'], $res['return']['message'], $entries['cost']);
         event(new SendMessage($sendByPatternResponse, $template_id));
 
