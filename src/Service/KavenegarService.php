@@ -120,7 +120,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
             'mobile' => $number, 'id' => $entries['messageid']
         ]]]);
 
-        $sendByPatternResponse = new SendByPatternResponse($res['return']['status'] == 200, $entries['messageid'], $res['return']['message'], $entries['cost']);
+        $sendByPatternResponse = new SendByPatternResponse($res['return']['status'] == 200, $entries['messageid'], $res['message'], $entries['cost']);
         event(new SendMessage($sendByPatternResponse, $template_id));
 
         return $sendByPatternResponse->toArray();
