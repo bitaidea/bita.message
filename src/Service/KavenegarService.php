@@ -116,7 +116,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $res = json_decode($result->getBody(), true);
         $entries = $res['entries'][0];
 
-        $this->log($res, ['receptor' => [[
+        $this->log($entries, ['receptor' => [[
             'mobile' => $number, 'id' => $entries['messageid']
         ]]]);
 
