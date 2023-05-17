@@ -96,11 +96,13 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
 
         if ($hasToken)
             foreach ($parameters as $k => $v) {
+                $v = $this->removeEmoji($v);
                 $qs .= "&$k=$v";
             }
         else
             foreach ($tokens as $k => $v) {
                 $val = str_replace(' ', '.', $v);
+                $val = $this->removeEmoji($val);
 
                 if ($k == 0)
                     $qs .= "&token=$val";
