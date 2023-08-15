@@ -35,6 +35,7 @@ class SmsBaseService
 
     public function DBLog($numbers, $originator, $message, $status, $service)
     {
+        $dataToInsert = [];
         foreach ($numbers as $v) {
             $dataToInsert[] = [
                 'message'  => $message,
@@ -47,6 +48,6 @@ class SmsBaseService
             ];
         }
         $tableName = config('bitamessage.tableName', 'sms_logs');
-        DB::table($tableName)->insert($dataToInsert);
+        return DB::table($tableName)->insert($dataToInsert);
     }
 }
