@@ -35,7 +35,9 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         if (!Config::get('bitamessage.logs')) return;
 
         $numbers = [];
-        if ($param['receptor'])
+        if ($param['receptor'] && is_string($param['receptor']))
+            $numbers[] = ['MobileNo' => $param['receptor'], 'ID' => $number['id']];
+        elseif($param['receptor'])
             foreach ($param['receptor'] as $number)
                 $numbers[] = ['MobileNo' => $number['mobile'], 'ID' => $number['id']];
 
@@ -82,7 +84,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
             $sendResponse = new SendResponse(!!$res['return']['status'], $entity['messageid'], $entity['message']);
             event(new SendMessage($sendResponse));
         }
-        
+
         return $sendResponse->toArray();
     }
 
