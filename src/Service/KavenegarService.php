@@ -35,13 +35,19 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         if (!Config::get('bitamessage.logs')) return;
 
         $numbers = [];
-        if ($param['receptor'] && is_string($param['receptor']))
+        if ($res['receptor'] && is_string($param['receptor']))
             $numbers[] = ['MobileNo' => $param['receptor']];
-        elseif($param['receptor'])
+        elseif ($param['receptor'])
             foreach ($param['receptor'] as $number)
                 $numbers[] = ['MobileNo' => $number['mobile'], 'ID' => $number['id']];
+        $message = 'خطا';
+        
+        if (isset($res['message']))
+            $message = $res['message'];
+        elseif (isset($res['entries'][0]))
+            $message = $res['entries'][0]['message'];
 
-        $this->DBLog($numbers, $this->getNumber(), $res['message'], 0, Config::get('bitamessage.kavenegar')['name']);
+        $this->DBLog($numbers, $this->getNumber(), $message, 0, Config::get('bitamessage.kavenegar')['name']);
     }
 
     public function checkDelivery($tracker_id)
