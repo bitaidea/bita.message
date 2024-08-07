@@ -8,6 +8,7 @@ use Bita\Message\Contract\Response\SendByPatternResponse;
 use Bita\Message\Contract\Response\SendResponse;
 use Bita\Message\Contract\SmsServiceInterface;
 use Bita\Message\Events\SendMessage;
+use Bita\Message\Exception\BitaException;
 use Bita\Message\Service\SmsBaseService;
 use Bita\Notification\Models\SmsLog;
 use Exception;
@@ -56,6 +57,8 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $key = $this->getToken();
         $result = $this->client->post("$key/sms/status.json?messageid={$tracker_id}");
         $res = json_decode($result->getBody(), true);
+        $this->getException($res);
+        return $res['entries'];
     }
 
 
@@ -174,5 +177,13 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
     public function getEndPoint()
     {
         return Config::get('bitamessage.kavenegar')['endPoint'];
+    }
+
+    public function getException($res)
+    {
+        if (isset($res['return']['status']) && $res['return']['status'] != 200) {
+            $error = isset($res['return']['message']) ? $res['return']['message'] : 'خظا';
+            throw new BitaException($error);
+        } else return;
     }
 }
