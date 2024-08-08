@@ -61,7 +61,14 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         return $res['entries'];
     }
 
-
+    public function getSms($tracker_id)
+    {
+        $key = $this->getToken();
+        $result = $this->client->post("$key/sms/select.json?messageid={$tracker_id}");
+        $res = json_decode($result->getBody(), true);
+        $this->getException($res);
+        return $res['entries'];
+    }
 
     /**
      * Simple send message with sms.ir account and line number
