@@ -42,7 +42,7 @@ class SmsIrV2Service extends SmsBaseService implements SmsServiceInterface
         ]);
     }
 
-    public function send($message, $numbers)
+    public function send($message, $numbers, $api = null, $sender = null)
     {
         $nms = (array)$numbers;
         $numbers = [];
@@ -61,7 +61,7 @@ class SmsIrV2Service extends SmsBaseService implements SmsServiceInterface
         return (new SendResponse($res['status'], $res['data']['packId'], $res['message'], $res['data']['cost']))->toArray();
     }
 
-    public function sendByPattern($pattern, $number, $parameters)
+    public function sendByPattern($pattern, $number, $parameters, $api = null)
     {
         $number = $this->pn2en($number);
         $params = [];

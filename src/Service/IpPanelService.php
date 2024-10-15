@@ -29,7 +29,7 @@ class IpPanelService extends SmsBaseService implements SmsServiceInterface
         }
     }
 
-    public function send($message, $numbers)
+    public function send($message, $numbers, $api = null, $sender = null)
     {
         $nms = (array)$numbers;
         $numbers = [];
@@ -51,7 +51,7 @@ class IpPanelService extends SmsBaseService implements SmsServiceInterface
         return $res;
     }
 
-    public function sendByPattern($pattern, $number, $parameters)
+    public function sendByPattern($pattern, $number, $parameters, $api = null)
     {
         $number = $this->pn2en($number);
         $param = [

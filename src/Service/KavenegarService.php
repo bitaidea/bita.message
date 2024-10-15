@@ -79,7 +79,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
      *
      * @return mixed, return status
      */
-    public function send($message, $numbers)
+    public function send($message, $numbers, $api = null, $sender = null)
     {
         $nms = (array)$numbers;
         $numbers = null;
@@ -88,8 +88,8 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
             if ($k + 1 < count($nms))
                 $numbers .= ",";
         }
-        $key = $this->getToken();
-        $body   = ['message' => $message, 'receptor' => $numbers, 'sender' => $this->getNumber()];
+        $key = $api ?? $this->getToken();
+        $body   = ['message' => $message, 'receptor' => $numbers, 'sender' => $sender ?? $this->getNumber()];
         $result     = $this->client->post("$key/sms/send.json", ['form_params' => $body]);
 
         $res = json_decode($result->getBody(), true);
@@ -112,7 +112,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
      * @return mixed = the result
      */
 
-    public function sendByPattern($template_id, $number, $parameters)
+    public function sendByPattern($template_id, $number, $parameters, $api = null)
     {
         $hasToken = Str::startsWith(array_keys($parameters)[0], 'token');
         $tokens = array_values($parameters);
@@ -134,14 +134,15 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
                 }
             }
 
-        $key = $this->getToken();
+        $key = $api ?? $this->getToken();
         $result = $this->client->get("$key/verify/lookup.json?receptor=$number&template=$template_id" . $qs);
 
         $res = json_decode($result->getBody(), true);
         $entries = $res['entries'][0];
 
         $this->log($entries, ['receptor' => [[
-            'mobile' => $number, 'id' => $entries['messageid']
+            'mobile' => $number,
+            'id' => $entries['messageid']
         ]]]);
 
         $sendByPatternResponse = new SendByPatternResponse($res['return']['status'] == 200, $entries['messageid'], $res['return']['message'], $entries['cost']);

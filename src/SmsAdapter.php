@@ -17,14 +17,14 @@ class SmsAdapter
         return (new $service);
     }
 
-    public function send($message, $numbers)
+    public function send($message, $numbers, $api = null, $sender = null)
     {
-        return $this->getService()->send($message, $numbers);
+        return $this->getService()->send($message, $numbers, $api, $sender);
     }
 
-    public function sendByPattern($pattern, $number, $parameters)
+    public function sendByPattern($pattern, $number, $parameters, $api = null)
     {
-        return $this->getService()->sendByPattern($pattern, $number, $parameters);
+        return $this->getService()->sendByPattern($pattern, $number, $parameters, $api);
     }
 
     public function checkDelivery($tracker_id)

@@ -33,7 +33,7 @@ class SmsIrService extends SmsBaseService implements SmsServiceInterface
         return json_decode($res->getBody(), true)['TokenKey'];
     }
 
-    public function send($message, $numbers)
+    public function send($message, $numbers, $api = null, $sender = null)
     {
         $nms = (array)$numbers;
         $numbers = [];
@@ -53,7 +53,7 @@ class SmsIrService extends SmsBaseService implements SmsServiceInterface
         return $res;
     }
 
-    public function sendByPattern($pattern, $number, $parameters)
+    public function sendByPattern($pattern, $number, $parameters, $api = null)
     {
         $number = $this->pn2en($number);
         $params = [];

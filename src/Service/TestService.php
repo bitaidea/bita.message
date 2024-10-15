@@ -28,34 +28,23 @@ class TestService extends SmsBaseService implements SmsServiceInterface
         }
     }
 
-    public function getToken()
-    {
+    public function getToken() {}
 
+    public function send($message, $numbers, $api = null, $sender = null)
+    {
+        return (new SendResponse(true, 290737339.0, "your verification code is sent"))->toArray();
     }
 
-    public function send($message, $numbers)
+    public function sendByPattern($pattern, $number, $parameters, $api = null)
     {
-        return (new SendResponse(true,290737339.0,"your verification code is sent"))->toArray();
+        return (new SendByPatternResponse(true, 290737339.0, "your verification code is sent"))->toArray();
     }
 
-    public function sendByPattern($pattern, $number, $parameters)
-    {
-        return (new SendByPatternResponse(true,290737339.0,"your verification code is sent"))->toArray();
-    }
+    public function checkDelivery($tracker_id) {}
 
-    public function checkDelivery($tracker_id)
-    {
-    }
+    public function credit() {}
 
-    public function credit()
-    {
-      
-    }
-
-    public function getMessage($tracker_id)
-    {
-      
-    }
+    public function getMessage($tracker_id) {}
 
     public function getEndPoint()
     {
