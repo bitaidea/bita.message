@@ -44,7 +44,7 @@ class TestService extends SmsBaseService implements SmsServiceInterface
 
     public function credit() {}
 
-    public function getMessage($tracker_id) {}
+    public function getMessage($tracker_id, $api = null) {}
 
     public function getEndPoint()
     {

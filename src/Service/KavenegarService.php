@@ -61,9 +61,9 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         return $res['entries'];
     }
 
-    public function getMessage($tracker_id)
+    public function getMessage($tracker_id, $api = null)
     {
-        $key = $this->getToken();
+        $key = $api ?? $this->getToken();
         $result = $this->client->post("$key/sms/select.json?messageid={$tracker_id}");
         $res = json_decode($result->getBody(), true);
         $this->getException($res);

@@ -82,7 +82,7 @@ class SmsIrService extends SmsBaseService implements SmsServiceInterface
         return $res;
     }
 
-    public function getMessage($tracker_id)
+    public function getMessage($tracker_id, $api = null)
     {
         $res = $this->client->get($this->getEndPoint() . 'MessageSend/' . $tracker_id, ['headers' => ['x-sms-ir-secure-token' => $this->getToken()]]);
         $res = json_decode($res->getBody()->getContents(), true);

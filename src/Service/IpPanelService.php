@@ -89,7 +89,7 @@ class IpPanelService extends SmsBaseService implements SmsServiceInterface
         return $res;
     }
 
-    public function getMessage($tracker_id)
+    public function getMessage($tracker_id, $api = null)
     {
         $res = $this->client->get($this->getEndPoint() . 'messages/' . $tracker_id, ['headers' => $this->getHeader()]);
         $res = json_decode($res->getBody()->getContents(), true);

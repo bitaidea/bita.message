@@ -91,7 +91,7 @@ class SmsIrV2Service extends SmsBaseService implements SmsServiceInterface
         return (new GetCreditResponse($res['data']))->toArray();
     }
 
-    public function getMessage($tracker_id)
+    public function getMessage($tracker_id, $api = null)
     {
         $res = $this->client->get($this->getEndPoint() . 'send' . $tracker_id, ['headers' => ['X-API-KEY' => $this->getApiKey()]]);
         $res = json_decode($res->getBody()->getContents(), true);

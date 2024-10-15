@@ -8,5 +8,6 @@ interface SmsServiceInterface
     public function send($message, $numbers, $api = null, $sender = null);
     public function sendByPattern($pattern, $number, $parameters, $api = null);
     public function checkDelivery($tracker_id);
+    public function getMessage($tracker_id, $api = null);
     public function credit();
 }
