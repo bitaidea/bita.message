@@ -36,4 +36,9 @@ class SmsAdapter
     {
         return $this->getService()->credit();
     }
+
+    public function getMessage($tracker_id)
+    {
+        return $this->getService()->getMessage($tracker_id);
+    }
 }
