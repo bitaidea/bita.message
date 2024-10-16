@@ -79,7 +79,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
      *
      * @return mixed, return status
      */
-    public function send($message, $numbers, $api = null, $sender = null)
+    public function send($message, $numbers, $api = null, $sender = null, $send_at = null)
     {
         $nms = (array)$numbers;
         $numbers = null;
@@ -90,6 +90,9 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         }
         $key = $api ?? $this->getToken();
         $body   = ['message' => $message, 'receptor' => $numbers, 'sender' => $sender ?? $this->getNumber()];
+        if ($send_at) {
+            $body['date'] = $send_at;
+        }
         $result     = $this->client->post("$key/sms/send.json", ['form_params' => $body]);
 
         $res = json_decode($result->getBody(), true);

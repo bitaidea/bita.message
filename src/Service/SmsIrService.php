@@ -33,7 +33,7 @@ class SmsIrService extends SmsBaseService implements SmsServiceInterface
         return json_decode($res->getBody(), true)['TokenKey'];
     }
 
-    public function send($message, $numbers, $api = null, $sender = null)
+    public function send($message, $numbers, $api = null, $sender = null, $send_at = null)
     {
         $nms = (array)$numbers;
         $numbers = [];

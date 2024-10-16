@@ -17,9 +17,9 @@ class SmsAdapter
         return (new $service);
     }
 
-    public function send($message, $numbers, $api = null, $sender = null)
+    public function send($message, $numbers, $api = null, $sender = null, $send_at = null)
     {
-        return $this->getService()->send($message, $numbers, $api, $sender);
+        return $this->getService()->send($message, $numbers, $api, $sender, $send_at);
     }
 
     public function sendByPattern($pattern, $number, $parameters, $api = null)
