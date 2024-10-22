@@ -92,7 +92,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $key = $api ?? $this->getToken();
         $body   = ['message' => $message, 'receptor' => $numbers, 'sender' => $sender ?? $this->getNumber()];
         if ($send_at) {
-            $body['date'] = Carbon::parse($send_at)->addHours(3)->addMinutes(30)->getTimestamp();
+            $body['date'] = strtotime(Carbon::parse($send_at)->addHours(3)->addMinutes(30));
         }
         $result     = $this->client->post("$key/sms/send.json", ['form_params' => $body]);
 
