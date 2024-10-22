@@ -12,6 +12,7 @@ use Bita\Message\Exception\BitaException;
 use Bita\Message\Service\SmsBaseService;
 use Bita\Notification\Models\SmsLog;
 use Exception;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
@@ -91,7 +92,7 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $key = $api ?? $this->getToken();
         $body   = ['message' => $message, 'receptor' => $numbers, 'sender' => $sender ?? $this->getNumber()];
         if ($send_at) {
-            $body['date'] = $send_at;
+            $body['date'] = Carbon::parse($send_at)->addHours(3)->addMinutes(30)->getTimestamp();
         }
         $result     = $this->client->post("$key/sms/send.json", ['form_params' => $body]);
 
