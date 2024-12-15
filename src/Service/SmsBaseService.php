@@ -40,7 +40,7 @@ class SmsBaseService
             $dataToInsert[] = [
                 'message'  => $message,
                 'status'   => $status,
-                'from'     => $originator,
+                'from'     => $v['Sender'] ?? $originator,
                 'to'       => $v['MobileNo'],
                 'tracking_code' => $v['ID'],
                 'service' => $service,

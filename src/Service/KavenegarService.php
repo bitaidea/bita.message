@@ -39,10 +39,10 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
         $numbers = [];
         if (isset($res['entries']) && is_array($res['entries']))
             foreach ($res['entries'] as $number)
-                $numbers[] = ['MobileNo' => $number['receptor'], 'ID' => $number['messageid']];
+                $numbers[] = ['MobileNo' => $number['receptor'], 'ID' => $number['messageid'], 'Sender' => $number['sender']];
         elseif ($param['receptor'])
             foreach ($param['receptor'] as $number)
-                $numbers[] = ['MobileNo' => $number['mobile'], 'ID' => $number['id']];
+                $numbers[] = ['MobileNo' => $number['mobile'], 'ID' => $number['id'], 'Sender' => null];
         $message = 'خطا';
 
         if (isset($res['message']))
