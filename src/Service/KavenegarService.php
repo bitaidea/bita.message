@@ -82,31 +82,35 @@ class KavenegarService extends SmsBaseService implements SmsServiceInterface
      */
     public function send($message, $numbers, $api = null, $sender = null, $send_at = null)
     {
-        $nms = (array)$numbers;
-        $numbers = null;
-        foreach ($nms as $k => $number) {
-            $numbers .= $this->pn2en($number);
-            if ($k + 1 < count($nms))
-                $numbers .= ",";
+        try {
+            $nms = (array)$numbers;
+            $numbers = null;
+            foreach ($nms as $k => $number) {
+                $numbers .= $this->pn2en($number);
+                if ($k + 1 < count($nms))
+                    $numbers .= ",";
+            }
+            $key = $api ?? $this->getToken();
+            $body   = ['message' => $message, 'receptor' => $numbers, 'sender' => $sender ?? $this->getNumber()];
+            if ($send_at) {
+                $body['date'] = strtotime(Carbon::parse($send_at)->addHours(3)->addMinutes(30));
+            }
+            $result     = $this->client->post("$key/sms/send.json", ['form_params' => $body]);
+
+            $res = json_decode($result->getBody(), true);
+            $this->log($res, $res['entries']);
+
+            $sendResponse = null;
+
+            foreach ($res['entries'] as $entity) {
+                $sendResponse = new SendResponse(!!$res['return']['status'], $entity['messageid'], $entity['message']);
+                event(new SendMessage($sendResponse));
+            }
+
+            return $sendResponse->toArray();
+        } catch (\Throwable $th) {
+            return ['status' => false, 'statustext' => $this->renderExceptionMessage($th->getMessage()), 'message' => $message];
         }
-        $key = $api ?? $this->getToken();
-        $body   = ['message' => $message, 'receptor' => $numbers, 'sender' => $sender ?? $this->getNumber()];
-        if ($send_at) {
-            $body['date'] = strtotime(Carbon::parse($send_at)->addHours(3)->addMinutes(30));
-        }
-        $result     = $this->client->post("$key/sms/send.json", ['form_params' => $body]);
-
-        $res = json_decode($result->getBody(), true);
-        $this->log($res, $res['entries']);
-
-        $sendResponse = null;
-
-        foreach ($res['entries'] as $entity) {
-            $sendResponse = new SendResponse(!!$res['return']['status'], $entity['messageid'], $entity['message']);
-            event(new SendMessage($sendResponse));
-        }
-
-        return $sendResponse->toArray();
     }
 
     /**

@@ -50,4 +50,13 @@ class SmsBaseService
         $tableName = config('bitamessage.tableName', 'sms_logs');
         return DB::table($tableName)->insert($dataToInsert);
     }
+
+    public function renderExceptionMessage($message)
+    {
+        $pattern = '/"message": "(.*?)"/s';
+        preg_match($pattern, $message, $matches);
+        $statusText = isset($matches[1]) ? $matches[1] : 'خطا در ارسال';
+
+        return $statusText;
+    }
 }
