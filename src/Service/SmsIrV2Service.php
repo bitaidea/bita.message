@@ -93,7 +93,7 @@ class SmsIrV2Service extends SmsBaseService implements SmsServiceInterface
 
     public function getMessage($tracker_id)
     {
-        $res = $this->client->get($this->getEndPoint() . 'send' . $tracker_id, ['headers' => ['X-API-KEY' => $this->getApiKey()]]);
+        $res = $this->client->get($this->getEndPoint() . 'send/' . $tracker_id, ['headers' => ['X-API-KEY' => $this->getApiKey()]]);
         $res = json_decode($res->getBody()->getContents(), true);
         $this->getException($res);
         return $res;
