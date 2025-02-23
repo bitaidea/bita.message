@@ -8,6 +8,7 @@ use Bita\Message\Contract\Response\SendResponse;
 use Bita\Message\Contract\SmsServiceInterface;
 use Bita\Message\Exception\BitaException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Config;
 
 class SmsIrV2Service extends SmsBaseService implements SmsServiceInterface
@@ -69,12 +70,15 @@ class SmsIrV2Service extends SmsBaseService implements SmsServiceInterface
             $params[] = ['Name' => $key, 'Value' => "{$value}"];
         }
         $param   = ['Parameters' => $params, 'TemplateId' => (int)$pattern, 'Mobile' => $number];
-        $res = $this->client->post('send/verify', ['body' => json_encode($param)]);
+        try {
 
-        $res = json_decode($res->getBody()->getContents(), true);
-        $this->getException($res);
-        $this->log($res, $param);
-        return (new SendByPatternResponse($res['status'], $res['data']['messageId'], $res['message'], $res['data']['cost']))->toArray();
+            $res = $this->client->post('send/verify', ['body' => json_encode($param)]);
+            $res = json_decode($res->getBody()->getContents(), true);
+            $this->log($res, $param);
+            return (new SendByPatternResponse($res['status'], $res['data']['messageId'], $res['message'], $res['data']['cost']))->toArray();
+        } catch (GuzzleException $e) {
+            throw new BitaException($e->getMessage(), $e->getCode());
+        }
     }
 
     public function checkDelivery($tracker_id)
