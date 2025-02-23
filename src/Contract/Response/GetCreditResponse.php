@@ -6,7 +6,7 @@ use Bita\Message\Contract\BaseResponse;
 
 class GetCreditResponse extends BaseResponse
 {
-    public function __construct(bool $credit)
+    public function __construct($credit)
     {
         $this->data = compact('credit');
     }
