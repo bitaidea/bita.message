@@ -59,7 +59,7 @@ class SmsIrV2Service extends SmsBaseService implements SmsServiceInterface
         $res = $this->client->post('send/bulk', ['body' => json_encode($param)]);
         $res = json_decode($res->getBody()->getContents(), true);
         $this->getException($res);
-        return (new SendResponse($res['status'], $res['data']['packId'], $res['message'], $res['data']['cost']))->toArray();
+        return (new SendResponse($res['status'], $res['data']['packId'], $res['message'], $res['data']['cost'], $res['data']['messageIds']))->toArray();
     }
 
     public function sendByPattern($pattern, $number, $parameters)
