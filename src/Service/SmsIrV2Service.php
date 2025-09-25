@@ -39,7 +39,8 @@ class SmsIrV2Service extends SmsBaseService implements SmsServiceInterface
                 'X-API-KEY' => $this->getApiKey(),
                 'ACCEPT' => 'application/json',
                 'Content-Type' => 'application/json'
-            ]
+            ],
+            'verify' => false,
         ]);
     }
 
